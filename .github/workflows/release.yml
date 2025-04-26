@@ -90,6 +90,8 @@ jobs:
           # tag_name: ${{ github.ref_name }} # Use the tag that triggered the workflow (default)
           # name: Release ${{ github.ref_name }} # Default release name is the tag
           files: |
-            artifacts/**/* # Upload all files from all subdirectories in artifacts
+            artifacts/SucaiTools-linux/SucaiTools-ubuntu-latest
+            artifacts/SucaiTools-macos/SucaiTools-macos-latest
+            artifacts/SucaiTools-windows.exe/SucaiTools-windows-latest.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Provided by GitHub Actions
