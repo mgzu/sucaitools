@@ -6,8 +6,10 @@ import os
 import threading
 import math
 import webbrowser
-import tkinterdnd2
+import tkinterdnd2 # Add import for tkinterdnd2
+
 from tkinter import messagebox
+from drag_drop_handler import handle_file_drop, handle_folder_drop # Add import for handlers
 
 # LanguageManager will be passed in
 
@@ -34,6 +36,14 @@ class Video2PngFrame(ctk.CTkFrame):
         self.label_video.grid(row=current_row, column=0, padx=10, pady=(10, 5), sticky="w")
         self.entry_video_path = ctk.CTkEntry(self, placeholder_text=self.lang_manager.get_text('placeholder_select_video'), width=350)
         self.entry_video_path.grid(row=current_row, column=1, padx=10, pady=(10, 5), sticky="ew")
+        # 添加拖拽支持
+        try:
+            self.entry_video_path.drop_target_register(tkinterdnd2.DND_FILES)
+            # Define allowed video extensions
+            video_extensions = {'.mp4', '.avi', '.mkv', '.mov', '.wmv'}
+            self.entry_video_path.dnd_bind('<<Drop>>', lambda e: handle_file_drop(e, self.entry_video_path, self.lang_manager, video_extensions, self.update_video_path_and_resolution))
+        except Exception as e:
+            print(f"视频输入框拖拽功能初始化失败: {e}")
         self.button_browse_video = ctk.CTkButton(self, text=self.lang_manager.get_text('browse'), command=self.select_video_file)
         self.button_browse_video.grid(row=current_row, column=2, padx=10, pady=(10, 5))
         current_row += 1
@@ -54,6 +64,12 @@ class Video2PngFrame(ctk.CTkFrame):
         self.label_output.grid(row=current_row, column=0, padx=10, pady=10, sticky="w")
         self.entry_output_dir = ctk.CTkEntry(self, placeholder_text=self.lang_manager.get_text('placeholder_select_output'), width=350)
         self.entry_output_dir.grid(row=current_row, column=1, padx=10, pady=10, sticky="ew")
+        # 添加拖拽支持
+        try:
+            self.entry_output_dir.drop_target_register(tkinterdnd2.DND_FILES)
+            self.entry_output_dir.dnd_bind('<<Drop>>', lambda e: handle_folder_drop(e, self.entry_output_dir, self.lang_manager, self.update_output_dir))
+        except Exception as e:
+            print(f"输出目录拖拽功能初始化失败: {e}")
         self.button_browse_output = ctk.CTkButton(self, text=self.lang_manager.get_text('browse'), command=self.select_output_dir)
         self.button_browse_output.grid(row=current_row, column=2, padx=10, pady=10)
         current_row += 1
@@ -204,50 +220,36 @@ class Video2PngFrame(ctk.CTkFrame):
             messagebox.showwarning(self.lang_manager.get_text('warning_title'), self.lang_manager.get_text('task_running'))
             return
         file_path = tkinter.filedialog.askopenfilename(
-            title=self.lang_manager.get_text('select_video_file_dialog_title'),
-            filetypes=[(self.lang_manager.get_text('video_files'), "*.mp4 *.avi *.mov *.mkv"), (self.lang_manager.get_text('all_files'), "*.*")]
+            title=self.lang_manager.get_text('select_video_file_title'),
+            filetypes=[(self.lang_manager.get_text('video_files'), "*.mp4 *.avi *.mov *.mkv *.wmv"), (self.lang_manager.get_text('all_files'), "*.*")]
         )
         if file_path:
-            self.video_path = file_path
-            self.entry_video_path.delete(0, tkinter.END)
-            self.entry_video_path.insert(0, self.video_path)
-            self.update_status(self.lang_manager.get_text('status_video_selected').format(filename=os.path.basename(self.video_path)))
-            self.get_video_resolution(file_path)
+            self.update_video_path_and_resolution(file_path)
 
-    def get_video_resolution(self, path):
-        """Tries to read video resolution and update the label."""
-        cap = None
-        try:
-            cap = cv2.VideoCapture(path)
-            if not cap.isOpened():
-                self.update_original_resolution_label(self.lang_manager.get_text('error_cant_open_video'))
-                return
-
-            self.original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            self.original_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-            if self.original_width > 0 and self.original_height > 0:
-                self.update_original_resolution_label(f"{self.original_width} x {self.original_height}")
-            else:
-                self.update_original_resolution_label(self.lang_manager.get_text('error_cant_read_resolution'))
-
-        except Exception as e:
-            self.log(f"Error reading resolution: {e}")
-            self.update_original_resolution_label(self.lang_manager.get_text('error_reading_resolution'))
-        finally:
-            if cap:
-                cap.release()
+    def update_video_path_and_resolution(self, file_path):
+        """Updates the video path entry and fetches resolution."""
+        self.video_path = file_path
+        self.entry_video_path.delete(0, tkinter.END)
+        self.entry_video_path.insert(0, self.video_path)
+        self.update_status(f"{self.lang_manager.get_text('status_selected_video')}: {os.path.basename(self.video_path)}")
+        self.get_video_resolution(file_path) # Get and display resolution
+        self.check_start_button_state()
 
     def select_output_dir(self):
         if self.is_processing:
             messagebox.showwarning(self.lang_manager.get_text('warning_title'), self.lang_manager.get_text('task_running'))
             return
-        dir_path = tkinter.filedialog.askdirectory(title=self.lang_manager.get_text('select_output_dir_dialog_title'))
+        dir_path = tkinter.filedialog.askdirectory(title=self.lang_manager.get_text('select_output_dir_title'))
         if dir_path:
-            self.output_dir = dir_path
-            self.entry_output_dir.delete(0, tkinter.END)
-            self.entry_output_dir.insert(0, self.output_dir)
-            self.update_status(self.lang_manager.get_text('status_output_selected').format(dirname=os.path.basename(self.output_dir)))
+            self.update_output_dir(dir_path)
+
+    def update_output_dir(self, dir_path):
+        """Updates the output directory entry."""
+        self.output_dir = dir_path
+        self.entry_output_dir.delete(0, tkinter.END)
+        self.entry_output_dir.insert(0, self.output_dir)
+        self.update_status(f"{self.lang_manager.get_text('status_selected_output')}: {self.output_dir}")
+        self.check_start_button_state()
 
     def toggle_interval_entry(self):
         if self.radio_var.get() == 1: # Interval selected
