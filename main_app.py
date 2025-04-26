@@ -85,19 +85,14 @@ class MainApplication(ctk.CTk):
             print(f"Could not switch language to: {selected_lang_name}") # Add logging
 
     def restart_application(self):
-        """重启应用程序以应用新的语言设置"""
+        """更新应用程序的语言设置"""
         try:
-            self.quit()
-            import sys
-            import os
-            python_executable = sys.executable
-            if not os.path.exists(python_executable):
-                print(f"错误：找不到Python解释器路径：{python_executable}")
-                return
-            os.execl(python_executable, python_executable, *sys.argv)
+            # 在打包环境下，直接更新UI文本而不是重启应用程序
+            self.update_ui_texts()
         except Exception as e:
-            print(f"重启应用程序时出错：{str(e)}")
-            # 如果重启失败，至少更新UI文本
+            print(f"更新界面文本时出错：{str(e)}")
+            # 如果更新失败，尝试重新加载默认语言
+            self.lang_manager.load_language('en')
             self.update_ui_texts()
 
     def update_ui_texts(self):
@@ -124,10 +119,16 @@ class MainApplication(ctk.CTk):
         # First unpack all tool frames
         if hasattr(self, 'renamer_app'):
             self.renamer_app.pack_forget()
+            self.renamer_app.destroy()
+            del self.renamer_app
         if hasattr(self, 'resizer_app'):
             self.resizer_app.pack_forget()
+            self.resizer_app.destroy()
+            del self.resizer_app
         if hasattr(self, 'video2png_app'):
             self.video2png_app.pack_forget()
+            self.video2png_app.destroy()
+            del self.video2png_app
 
         # Remove all existing tabs
         for tab in self.tab_view._tab_dict.copy():
@@ -156,17 +157,18 @@ class MainApplication(ctk.CTk):
         self.update()
 
         # Re-pack the tool frames into their new tabs
-        if hasattr(self, 'renamer_app'):
-            self.renamer_app.pack(in_=self.renamer_tab_frame, expand=True, fill="both")
-            self.renamer_app.update_ui_texts()
+        # 重新实例化并pack
+        self.renamer_app = RenamerFrame(self.renamer_tab_frame, self.lang_manager)
+        self.renamer_app.pack(expand=True, fill="both")
+        self.renamer_app.update_ui_texts()
 
-        if hasattr(self, 'resizer_app'):
-            self.resizer_app.pack(in_=self.resizer_tab_frame, expand=True, fill="both")
-            self.resizer_app.update_ui_texts()
+        self.resizer_app = ImageResizerFrame(self.resizer_tab_frame, self.lang_manager)
+        self.resizer_app.pack(expand=True, fill="both")
+        self.resizer_app.update_ui_texts()
 
-        if hasattr(self, 'video2png_app'):
-            self.video2png_app.pack(in_=self.video2png_tab_frame, expand=True, fill="both")
-            self.video2png_app.update_ui_texts()
+        self.video2png_app = Video2PngFrame(self.video2png_tab_frame, self.lang_manager)
+        self.video2png_app.pack(expand=True, fill="both")
+        self.video2png_app.update_ui_texts()
 
         # Try to set the previously selected tab
         try:
