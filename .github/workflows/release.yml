@@ -43,6 +43,7 @@ jobs:
 
     - name: Build with PyInstaller
       # Use the correct executable name based on OS suffix
+      shell: bash # 指定使用bash shell
       run: |
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
           pyinstaller --onefile ${{ matrix.pyinstaller_flags }} --add-data "languages;languages" --name SucaiTools-${{ matrix.os }} main_app.py
