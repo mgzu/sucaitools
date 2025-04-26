@@ -43,7 +43,12 @@ jobs:
 
     - name: Build with PyInstaller
       # Use the correct executable name based on OS suffix
-      run: pyinstaller --onefile ${{ matrix.pyinstaller_flags }} --name SucaiTools-${{ matrix.os }} main_app.py
+      run: |
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          pyinstaller --onefile ${{ matrix.pyinstaller_flags }} --add-data "languages;languages" --name SucaiTools-${{ matrix.os }} main_app.py
+        else
+          pyinstaller --onefile ${{ matrix.pyinstaller_flags }} --add-data "languages:languages" --name SucaiTools-${{ matrix.os }} main_app.py
+        fi
 
     - name: Prepare Artifact Path
       id: artifact_path
@@ -83,6 +88,7 @@ jobs:
         with:
           # tag_name: ${{ github.ref_name }} # Use the tag that triggered the workflow (default)
           # name: Release ${{ github.ref_name }} # Default release name is the tag
-          files: artifacts/**/* # Upload all files from all subdirectories in artifacts
+          files: |
+            artifacts/**/* # Upload all files from all subdirectories in artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Provided by GitHub Actions
