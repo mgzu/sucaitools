@@ -22,7 +22,7 @@ class Video2PngFrame(ctk.CTkFrame):
         self.is_processing = False
         self.original_width = 0
         self.original_height = 0
-        self.github_url = "https://github.com/dependon/video2png" # Keep URL for link
+        self.github_url = "https://github.com/dependon/sucaitools" # Keep URL for link
         # 视频文件扩展名
         self.video_extensions = {'.mp4', '.avi', '.mkv', '.mov', '.wmv'}
 

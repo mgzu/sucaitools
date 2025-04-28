@@ -28,7 +28,7 @@ class FrameExtractorApp(tkinterdnd2.TkinterDnD.Tk):
         self.is_processing = False
         self.original_width = 0
         self.original_height = 0
-        self.github_url = "https://github.com/dependon/video2png" # <-- 定义URL
+        self.github_url = "https://github.com/dependon/sucaitools" # <-- 定义URL
 
         # --- GUI 组件 ---
         self.grid_columnconfigure(1, weight=1)

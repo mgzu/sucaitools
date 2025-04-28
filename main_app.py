@@ -4,6 +4,7 @@ from language_manager import LanguageManager
 from rename_images_gui import RenamerFrame # Import the refactored frame
 from image_resizer_gui import ImageResizerFrame # Import the image resizer frame
 from video2png_gui import Video2PngFrame # Import the video to png frame
+import webbrowser
 # Import other tool modules here later
 
 import tkinterdnd2
@@ -55,6 +56,11 @@ class MainApplication(ctk.CTk):
         # Instantiate and pack the Video2PngFrame into its tab
         self.video2png_app = Video2PngFrame(self.video2png_tab_frame, self.lang_manager)
         self.video2png_app.pack(expand=True, fill="both")
+
+        # GitHub 仓库地址
+        self.github_label = ctk.CTkLabel(self, text="GitHub: https://github.com/dependon/sucaitools", cursor="hand2", text_color="#78e46f")
+        self.github_label.pack(side="bottom", pady=5)
+        self.github_label.bind("<Button-1>", lambda event: webbrowser.open_new("https://github.com/dependon/sucaitools"))
 
         # Add other tool frames here
 
