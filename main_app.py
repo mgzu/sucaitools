@@ -6,12 +6,18 @@ from image_resizer_gui import ImageResizerFrame # Import the image resizer frame
 from video2png_gui import Video2PngFrame # Import the video to png frame
 # Import other tool modules here later
 
+import tkinterdnd2
+
 class MainApplication(ctk.CTk):
     def __init__(self):
         super().__init__()
-
+        # 初始化TkinterDnD，但不使用多重继承
+        self.TkdndVersion = tkinterdnd2.TkinterDnD._require(self)
+        
         self.lang_manager = LanguageManager()
 
+        self.configure(bg="#242424")      # 设置主窗口背景为深灰色
+ 
         self.title(self.lang_manager.get_text('main_title')) # Assuming 'main_title' key exists
         self.geometry("800x600")
 
@@ -183,6 +189,30 @@ class MainApplication(ctk.CTk):
             # Default to first tab if there's an error
             self.tab_view.set(new_renamer_name)
 
+    def destroy(self):
+        """重写destroy方法，确保正确清理资源"""
+        try:
+            # 先清理所有子组件
+            for widget in self.winfo_children():
+                if hasattr(widget, 'destroy'):
+                    try:
+                        widget.destroy()
+                    except Exception as e:
+                        print(f"清理子组件时出错: {str(e)}")
+            
+            # 手动清理可能导致问题的命令和回调
+            try:
+                for command in list(self.tk.call('after', 'info')):
+                    self.after_cancel(command)
+            except Exception as e:
+                print(f"清理after命令时出错: {str(e)}")
+                
+            # 最后调用父类的destroy方法
+            super().destroy()
+        except Exception as e:
+            print(f"销毁窗口时出错: {str(e)}")
+
 if __name__ == "__main__":
     app = MainApplication()
+    app.protocol("WM_DELETE_WINDOW", app.destroy)
     app.mainloop()

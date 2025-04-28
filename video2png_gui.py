@@ -6,16 +6,15 @@ import os
 import threading
 import math
 import webbrowser
-import tkinterdnd2 # Add import for tkinterdnd2
-
+from tkinterdnd2 import DND_FILES  # 只导入DND_FILES常量，TkinterDnD已在主应用程序中初始化
 from tkinter import messagebox
 from drag_drop_handler import handle_file_drop, handle_folder_drop # Add import for handlers
-
-# LanguageManager will be passed in
+import tkinterdnd2                     # 导入 TkDND 库
 
 class Video2PngFrame(ctk.CTkFrame):
     def __init__(self, master, lang_manager):
         super().__init__(master)
+
         self.lang_manager = lang_manager
 
         self.video_path = ""
@@ -24,6 +23,8 @@ class Video2PngFrame(ctk.CTkFrame):
         self.original_width = 0
         self.original_height = 0
         self.github_url = "https://github.com/dependon/video2png" # Keep URL for link
+        # 视频文件扩展名
+        self.video_extensions = {'.mp4', '.avi', '.mkv', '.mov', '.wmv'}
 
         # --- GUI 组件 ---
         self.grid_columnconfigure(1, weight=1)
@@ -38,10 +39,11 @@ class Video2PngFrame(ctk.CTkFrame):
         self.entry_video_path.grid(row=current_row, column=1, padx=10, pady=(10, 5), sticky="ew")
         # 添加拖拽支持
         try:
-            self.entry_video_path.drop_target_register(tkinterdnd2.DND_FILES)
-            # Define allowed video extensions
-            video_extensions = {'.mp4', '.avi', '.mkv', '.mov', '.wmv'}
-            self.entry_video_path.dnd_bind('<<Drop>>', lambda e: handle_file_drop(e, self.entry_video_path, self.lang_manager, video_extensions, self.update_video_path_and_resolution))
+            # 注册拖放目标
+            self.entry_video_path.drop_target_register(DND_FILES)
+            # 绑定拖放事件
+            self.entry_video_path.dnd_bind('<<Drop>>', 
+                                        lambda e: self.on_drop_video(e))
         except Exception as e:
             print(f"视频输入框拖拽功能初始化失败: {e}")
         self.button_browse_video = ctk.CTkButton(self, text=self.lang_manager.get_text('browse'), command=self.select_video_file)
@@ -64,10 +66,14 @@ class Video2PngFrame(ctk.CTkFrame):
         self.label_output.grid(row=current_row, column=0, padx=10, pady=10, sticky="w")
         self.entry_output_dir = ctk.CTkEntry(self, placeholder_text=self.lang_manager.get_text('placeholder_select_output'), width=350)
         self.entry_output_dir.grid(row=current_row, column=1, padx=10, pady=10, sticky="ew")
+
         # 添加拖拽支持
         try:
-            self.entry_output_dir.drop_target_register(tkinterdnd2.DND_FILES)
-            self.entry_output_dir.dnd_bind('<<Drop>>', lambda e: handle_folder_drop(e, self.entry_output_dir, self.lang_manager, self.update_output_dir))
+            # 注册拖放目标
+            self.entry_output_dir.drop_target_register(DND_FILES)
+            # 绑定拖放事件
+            self.entry_output_dir.dnd_bind('<<Drop>>', 
+                                          lambda e: self.on_drop_output(e))
         except Exception as e:
             print(f"输出目录拖拽功能初始化失败: {e}")
         self.button_browse_output = ctk.CTkButton(self, text=self.lang_manager.get_text('browse'), command=self.select_output_dir)
@@ -226,14 +232,51 @@ class Video2PngFrame(ctk.CTkFrame):
         if file_path:
             self.update_video_path_and_resolution(file_path)
 
+    def on_drop_video(self, event, allowed_extensions):
+        """处理视频文件拖放事件"""
+        try:
+            path = event.data.strip('{}')
+            if os.path.isfile(path):
+                ext = os.path.splitext(path)[1].lower()
+                if ext in self.video_extensions:
+                    self.update_video_path_and_resolution(path)
+                else:
+                    messagebox.showerror(
+                        self.lang_manager.get_text('error_title'),
+                        self.lang_manager.get_text('invalid_file_type').format(ext=ext)
+                    )
+        except Exception as e:
+            messagebox.showerror(
+                self.lang_manager.get_text('error_title'),
+                self.lang_manager.get_text('file_drop_error').format(error=str(e))
+            )
+            
     def update_video_path_and_resolution(self, file_path):
         """Updates the video path entry and fetches resolution."""
         self.video_path = file_path
         self.entry_video_path.delete(0, tkinter.END)
         self.entry_video_path.insert(0, self.video_path)
         self.update_status(f"{self.lang_manager.get_text('status_selected_video')}: {os.path.basename(self.video_path)}")
-        self.get_video_resolution(file_path) # Get and display resolution
+        self.get_video_resolution(file_path)  # Get and display resolution
         self.check_start_button_state()
+
+    def get_video_resolution(self, video_path):
+        """获取视频分辨率并在标签中显示."""
+        try:
+            cap = cv2.VideoCapture(video_path)
+            if not cap.isOpened():
+                self.update_original_resolution_label(self.lang_manager.get_text('error_cant_open_video'))
+                return
+
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self.original_width = width
+            self.original_height = height
+            cap.release()
+            resolution_text = f"{width}x{height}"
+            self.update_original_resolution_label(resolution_text)
+        except Exception as e:
+            self.update_original_resolution_label(self.lang_manager.get_text('error_resolution_failed').format(error=e))
 
     def select_output_dir(self):
         if self.is_processing:
@@ -243,6 +286,23 @@ class Video2PngFrame(ctk.CTkFrame):
         if dir_path:
             self.update_output_dir(dir_path)
 
+    def on_drop_output(self, event):
+        """处理输出目录拖放事件"""
+        try:
+            path = event.data.strip('{}')
+            if os.path.isdir(path):
+                self.update_output_dir(path)
+            else:
+                messagebox.showerror(
+                    self.lang_manager.get_text('error_title'),
+                    self.lang_manager.get_text('invalid_folder_path')
+                )
+        except Exception as e:
+            messagebox.showerror(
+                self.lang_manager.get_text('error_title'),
+                self.lang_manager.get_text('folder_drop_error').format(error=str(e))
+            )
+    
     def update_output_dir(self, dir_path):
         """Updates the output directory entry."""
         self.output_dir = dir_path

@@ -3,6 +3,8 @@ import tkinter as tk
 import customtkinter as ctk # Import customtkinter
 from tkinter import filedialog, messagebox, scrolledtext, ttk
 import threading
+from tkinterdnd2 import DND_FILES  # 只导入DND_FILES常量，TkinterDnD已在主应用程序中初始化
+from drag_drop_handler import handle_folder_drop # Add import for handlers
 # LanguageManager will be passed in, no need to import if passed
 # from language_manager import LanguageManager
 
@@ -91,10 +93,21 @@ class RenamerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         # 文件夹选择部分 (Use self as master)
         # Use CTk widgets for consistency
         ctk.CTkLabel(self, text=self.lang_manager.get_text('select_folder')).grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        self.folder_entry = ctk.CTkEntry(self, textvariable=self.selected_folder, width=350, state='readonly') # Adjusted width
+        self.folder_entry = ctk.CTkEntry(self, textvariable=self.selected_folder, width=350) # Adjusted width
         self.folder_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+
         self.browse_button = ctk.CTkButton(self, text=self.lang_manager.get_text('browse'), command=self.browse_folder)
         self.browse_button.grid(row=0, column=2, padx=5, pady=5)
+
+        # --- Drag and Drop ---
+        try:
+            # 注册拖放目标
+            self.folder_entry.drop_target_register(DND_FILES)
+            # 绑定拖放事件
+            self.folder_entry.dnd_bind('<<Drop>>', 
+                                      lambda e: handle_folder_drop(e, self.folder_entry, self.lang_manager))
+        except Exception as e:
+            print(f"文件夹拖拽功能初始化失败: {e}")
 
         # 开始按钮 (Use self as master)
         self.rename_button = ctk.CTkButton(self, text=self.lang_manager.get_text('start_rename'), command=self.start_renaming_thread)
@@ -148,6 +161,10 @@ class RenamerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         folder = filedialog.askdirectory()
         if folder:
             self.selected_folder.set(folder)
+
+    def update_folder_path(self, path):
+        """Update the folder path."""
+        self.selected_folder.set(path)
 
     def start_renaming_thread(self):
         if self.is_running:

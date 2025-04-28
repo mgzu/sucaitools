@@ -6,6 +6,8 @@ import webbrowser
 from image_resizer import process_directory, process_image
 # from language_manager import LanguageManager # Will be passed in
 import os
+from tkinterdnd2 import DND_FILES  # 只导入DND_FILES常量，TkinterDnD已在主应用程序中初始化
+from drag_drop_handler import handle_file_drop, handle_folder_drop # Add import for handlers
 
 class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
     def __init__(self, master, lang_manager): # Accept master and lang_manager
@@ -26,11 +28,21 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         self.select_label = ctk.CTkLabel(select_frame, text=self.lang_manager.get_text('select_folder')) # Use lang_manager
         self.select_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
 
-        self.folder_entry = ctk.CTkEntry(select_frame, textvariable=self.folder_path, state='readonly')
+        self.folder_entry = ctk.CTkEntry(select_frame, textvariable=self.folder_path)
         self.folder_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
         self.select_btn = ctk.CTkButton(select_frame, text=self.lang_manager.get_text('browse'), command=self.select_directory)
         self.select_btn.grid(row=0, column=2, padx=5, pady=5)
+
+        # --- Drag and Drop ---
+        try:
+            # 注册拖放目标
+            self.folder_entry.drop_target_register(DND_FILES)
+            # 绑定拖放事件
+            self.folder_entry.dnd_bind('<<Drop>>', 
+                                      lambda e: handle_folder_drop(e, self.folder_entry, self.lang_manager))
+        except Exception as e:
+            print(f"文件夹拖拽功能初始化失败: {e}")
 
         # --- Mode Selection --- 
         self.mode_frame = ctk.CTkFrame(self) # Use CTkFrame
@@ -88,7 +100,13 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         # GitHub link can be added back if needed, maybe in a help menu or about section in main app
         # For now, removing it from the frame itself
 
-        self.toggle_inputs() # 初始化输入框状态
+        self.toggle_inputs()
+
+    def update_folder_path(self, path):
+        """Update the folder path and status label."""
+        self.folder_path.set(path)
+        self.status_label.configure(text=self.lang_manager.get_text('status_folder_selected').format(folder=path), text_color='gray')
+        self.process_btn.configure(state=tk.NORMAL)
 
     def toggle_inputs(self, *args):
         """Enable/disable inputs based on selected mode."""
@@ -101,7 +119,7 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
             self.scale_entry.configure(state=tk.DISABLED)
             self.width_entry.configure(state=tk.NORMAL)
             self.height_entry.configure(state=tk.NORMAL)
-        else: # Disable all if mode is somehow invalid
+        else:
             self.scale_entry.configure(state=tk.DISABLED)
             self.width_entry.configure(state=tk.DISABLED)
             self.height_entry.configure(state=tk.DISABLED)
