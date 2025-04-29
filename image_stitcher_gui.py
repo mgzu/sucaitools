@@ -11,6 +11,8 @@ class ImageStitcherFrame(ctk.CTkFrame):
         super().__init__(master)
         self.lang_manager = lang_manager
         self.selected_folder = None
+        self.folder_path_var = ctk.StringVar()
+        self.folder_path_var.trace_add("write", self.on_folder_entry_change)
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
@@ -19,28 +21,34 @@ class ImageStitcherFrame(ctk.CTkFrame):
         # --- Folder Selection ---
         self.folder_frame = ctk.CTkFrame(self)
         self.folder_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
-        self.folder_frame.grid_columnconfigure(0, weight=1) # Label column
-        self.folder_frame.grid_columnconfigure(1, weight=3) # Entry column
-        self.folder_frame.grid_columnconfigure(2, weight=1) # Button column
+        # Configure grid layout for folder_frame
+        self.folder_frame.grid_columnconfigure(0, weight=3) # Entry column
+        self.folder_frame.grid_columnconfigure(1, weight=1) # Button column
+        self.folder_frame.grid_rowconfigure(0, weight=0) # Label row
+        self.folder_frame.grid_rowconfigure(1, weight=1) # Entry and Button row
+
 
         self.folder_label = ctk.CTkLabel(self.folder_frame, text=self.lang_manager.get_text('stitcher_folder_label'))
-        self.folder_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.folder_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="w") # Label spans two columns
 
-        self.folder_entry = ctk.CTkEntry(self.folder_frame, placeholder_text=self.lang_manager.get_text('stitcher_folder_placeholder'))
-        self.folder_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.folder_entry = ctk.CTkEntry(self.folder_frame, 
+                                         placeholder_text=self.lang_manager.get_text('stitcher_folder_placeholder'),
+                                         textvariable=self.folder_path_var)
+        self.folder_entry.grid(row=1, column=0, padx=5, pady=5, sticky="ew") # Entry in row 1, column 0
 
         # --- Drag and Drop ---
         try:
             # 注册拖放目标
             self.folder_entry.drop_target_register(DND_FILES)
             # 绑定拖放事件
+            # Bind the drag and drop event to the handler, passing the entry widget
             self.folder_entry.dnd_bind('<<Drop>>', 
                                       lambda e: handle_folder_drop(e, self.folder_entry, self.lang_manager))
         except Exception as e:
             print(f"文件夹拖拽功能初始化失败: {e}")
 
         self.select_folder_button = ctk.CTkButton(self.folder_frame, text=self.lang_manager.get_text('stitcher_select_folder_button'), command=self.select_folder)
-        self.select_folder_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
+        self.select_folder_button.grid(row=1, column=1, padx=5, pady=5, sticky="e") # Button in row 1, column 1
 
         # --- Status Label ---
         self.status_label = ctk.CTkLabel(self, text="", wraplength=780)
@@ -71,17 +79,31 @@ class ImageStitcherFrame(ctk.CTkFrame):
         self.image_display_label.bind("<Configure>", self.on_image_display_resize)
 
 
-    def select_folder(self):
-        folder_path = filedialog.askdirectory()
-        if folder_path:
+    def on_folder_entry_change(self, *args):
+        """Handles changes to the folder_entry textvariable."""
+        folder_path = self.folder_path_var.get()
+        if folder_path and os.path.isdir(folder_path): # Add check if it's a valid directory
             self.selected_folder = folder_path
             self.folder_label.configure(text=f"{self.lang_manager.get_text('stitcher_folder_label')}: {self.selected_folder}")
             self.status_label.configure(text=self.lang_manager.get_text('stitcher_folder_selected').format(folder=os.path.basename(folder_path)))
             self.save_button.configure(state="disabled") # Disable save until stitched
             self.stitched_image = None # Reset stitched image
+        else:
+             # Handle case where entry is cleared or invalid path
+             self.selected_folder = None
+             self.folder_label.configure(text=self.lang_manager.get_text('stitcher_folder_label'))
+             self.status_label.configure(text="")
+             self.save_button.configure(state="disabled")
+             self.stitched_image = None
+             self.image_display_label.configure(image=None, text=self.lang_manager.get_text('stitcher_display_area')) # Clear displayed image
+
+    def select_folder(self):
+        folder_path = filedialog.askdirectory()
+        if folder_path:
+            self.folder_path_var.set(folder_path) # Update the StringVar
 
     def stitch_images(self):
-        if not self.selected_folder:
+        if not self.selected_folder or not os.path.isdir(self.selected_folder):
             self.status_label.configure(text=self.lang_manager.get_text('stitcher_no_folder_selected'))
             return
 
