@@ -12,7 +12,7 @@ class LanguageManager:
         self.languages_dir = os.path.join(os.path.dirname(__file__), 'languages') 
         self.supported_languages = {
             'en': 'English',
-            'zh': '中文',
+            'zh_CN': '中文',
             'ru': 'Русский',
             'ja': '日本語',
             'de': 'Deutsch',

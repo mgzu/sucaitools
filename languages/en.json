@@ -111,7 +111,6 @@
   "log_drop_invalid_video": "Dropped item is not a valid video file.",
   "log_drop_invalid_output": "Dropped item is not a valid directory.",
 
-  "tab_mp4_to_gif": "MP4 to GIF",
   "select_mp4_file": "Select MP4 File:",
   "select_gif_output": "Save GIF As:",
   "start_conversion": "Start Conversion",

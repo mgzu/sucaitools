@@ -132,7 +132,7 @@ class MainApplication(ctk.CTk):
         new_renamer_name = self.lang_manager.get_text('tab_rename_images')
         new_resizer_name = self.lang_manager.get_text('tab_resize_images')
         new_video2png_name = self.lang_manager.get_text('tab_video_to_png')
-        new_mp4_to_gif_name = self.lang_manager.get_text('tab_mp4_to_gif', 'MP4 to GIF') # Get new name for the tab
+        new_mp4_to_gif_name = self.lang_manager.get_text('tab_mp4_to_gif') # Get new name for the tab
 
         # Store current tab for later
         current_tab = self.tab_view.get()
