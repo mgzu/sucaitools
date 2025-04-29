@@ -53,9 +53,16 @@ class Mp4ToGifFrame(ctk.CTkFrame):
         self.browse_gif_button.grid(row=current_row, column=2, padx=5, pady=5)
         current_row += 1
 
-        # TODO: Add options like FPS, resolution, etc. later
+        # 3. FPS Display and Input
+        self.fps_label = ctk.CTkLabel(self, text=self.lang_manager.get_text('original_fps') + ": N/A")
+        self.fps_label.grid(row=current_row, column=0, padx=5, pady=5, sticky="w")
 
-        # 3. Start Button
+        ctk.CTkLabel(self, text=self.lang_manager.get_text('set_fps')).grid(row=current_row, column=1, padx=5, pady=5, sticky="e")
+        self.fps_entry = ctk.CTkEntry(self, width=100)
+        self.fps_entry.grid(row=current_row, column=2, padx=5, pady=5, sticky="w")
+        current_row += 1
+
+        # 4. Start Button
         self.convert_button = ctk.CTkButton(self, text=self.lang_manager.get_text('start_conversion'), command=self.start_conversion_thread)
         self.convert_button.grid(row=current_row, column=0, columnspan=3, padx=5, pady=10)
         current_row += 1
@@ -92,6 +99,24 @@ class Mp4ToGifFrame(ctk.CTkFrame):
                                             filetypes=[("MP4 files", "*.mp4")])
         if filepath:
             self.mp4_path.set(filepath)
+            
+            # Get and display original FPS
+            try:
+                cap = cv2.VideoCapture(filepath)
+                original_fps = cap.get(cv2.CAP_PROP_FPS)
+                cap.release()
+                if original_fps > 0:
+                    self.fps_label.configure(text=self.lang_manager.get_text('original_fps') + f": {original_fps:.2f}")
+                    self.fps_entry.delete(0, tk.END)
+                    self.fps_entry.insert(0, f"{original_fps:.2f}") # Pre-fill with original FPS
+                else:
+                    self.fps_label.configure(text=self.lang_manager.get_text('original_fps') + ": N/A")
+                    self.fps_entry.delete(0, tk.END)
+            except Exception as e:
+                self.log(f"Error getting video info: {e}")
+                self.fps_label.configure(text=self.lang_manager.get_text('original_fps') + ": Error")
+                self.fps_entry.delete(0, tk.END)
+
             # Auto-suggest output path
             if not self.gif_path.get():
                 output_dir = os.path.dirname(filepath)
@@ -140,16 +165,29 @@ class Mp4ToGifFrame(ctk.CTkFrame):
         self.browse_gif_button.configure(state='disabled')
         self.is_running = True
 
-        self.conversion_thread = threading.Thread(target=self.run_conversion_task, args=(mp4_file, gif_file))
+        # Get desired FPS from entry
+        try:
+            desired_fps = float(self.fps_entry.get())
+            if desired_fps <= 0:
+                raise ValueError("FPS must be positive.")
+        except ValueError:
+            messagebox.showerror(self.lang_manager.get_text('error'), self.lang_manager.get_text('invalid_fps_value'))
+            self.is_running = False
+            self.convert_button.configure(state='normal', text=self.lang_manager.get_text('start_conversion'))
+            self.browse_mp4_button.configure(state='normal')
+            self.browse_gif_button.configure(state='normal')
+            return
+
+        self.conversion_thread = threading.Thread(target=self.run_conversion_task, args=(mp4_file, gif_file, desired_fps))
         self.conversion_thread.daemon = True
         self.conversion_thread.start()
 
-    def run_conversion_task(self, mp4_file, gif_file):
+    def run_conversion_task(self, mp4_file, gif_file, desired_fps):
         try:
             self.log(self.lang_manager.get_text('conversion_started').format(input=mp4_file, output=gif_file))
             
             # --- Actual Conversion Logic using OpenCV and Pillow ---
-            self.convert_mp4_to_gif_opencv(mp4_file, gif_file)
+            self.convert_mp4_to_gif_opencv(mp4_file, gif_file, desired_fps)
             
             self.log(self.lang_manager.get_text('conversion_success').format(output=gif_file))
         except Exception as e:
@@ -161,9 +199,9 @@ class Mp4ToGifFrame(ctk.CTkFrame):
                 self.convert_button.configure(state='normal', text=self.lang_manager.get_text('start_conversion'))
                 self.browse_mp4_button.configure(state='normal')
                 self.browse_gif_button.configure(state='normal')
-            self.after(0, _finalize_ui)
+        self.after(0, _finalize_ui)
 
-    def convert_mp4_to_gif_opencv(self, mp4_path, gif_path):
+    def convert_mp4_to_gif_opencv(self, mp4_path, gif_path, desired_fps):
         """
         Converts an MP4 file to a GIF file using OpenCV and Pillow.
         """
@@ -172,11 +210,10 @@ class Mp4ToGifFrame(ctk.CTkFrame):
             raise IOError(f"无法打开视频文件: {mp4_path}")
 
         frames = []
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        if fps <= 0:
-             fps = 10 # Default FPS if unable to get from video
+        # Use the desired_fps instead of the original video's FPS
+        fps_to_use = desired_fps
 
-        self.log(f"视频帧率: {fps}")
+        self.log(f"使用帧率: {fps_to_use}")
 
         while True:
             ret, frame = cap.read()
@@ -194,8 +231,8 @@ class Mp4ToGifFrame(ctk.CTkFrame):
         if not frames:
             raise ValueError("未从视频中读取到任何帧。")
 
-        # Calculate duration per frame in milliseconds
-        duration_ms = int(1000 / fps)
+        # Calculate duration per frame in milliseconds using the desired FPS
+        duration_ms = int(1000 / fps_to_use)
 
         self.log(f"共读取 {len(frames)} 帧，开始生成 GIF...")
 

@@ -135,5 +135,20 @@
   "processing_frame": "Processing frame {frame_num}",
   "no_frames_read": "No frames read from video.",
   "generating_gif": "Read {num_frames} frames, starting GIF generation...",
-  "gif_generation_complete": "GIF generation complete."
+  "gif_generation_complete": "GIF generation complete.",
+
+  "tab_image_stitcher": "Image Stitcher",
+  "stitcher_folder_label": "Select Folder",
+  "stitcher_select_folder_button": "Select Folder",
+  "stitcher_stitch_button": "Start Stitching",
+  "stitcher_save_button": "Save Image",
+  "stitcher_no_folder_selected": "Please select a folder first.",
+  "stitcher_no_images_found": "No image files found in the selected folder.",
+  "stitcher_error_loading_images": "Error loading images: {error}",
+  "stitcher_no_valid_images": "No valid images found in the selected folder.",
+  "stitcher_stitching_complete": "Image stitching complete.",
+  "stitcher_save_success": "Stitched image saved to: {path}",
+  "stitcher_error_saving": "Error saving image: {error}",
+  "stitcher_no_image_to_save": "No stitched image to save.",
+  "stitcher_folder_selected": "Folder selected: {folder}"
 }

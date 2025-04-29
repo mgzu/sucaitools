@@ -124,6 +124,10 @@
   "output_is_directory": "输出路径不能是目录。",
   "confirm_conversion": "开始转换吗？",
 
+  "original_fps": "原始帧率",
+  "set_fps": "设置帧率",
+  "invalid_fps_value": "无效的帧率值。请输入一个正数。",
+
   "total_frames": "总帧数:",
   "compression_ratio": "压缩比例:",
   "compression_ratio_desc": "(例如，2 表示每隔 2 帧处理一次)",
@@ -135,5 +139,20 @@
   "processing_frame": "正在处理帧 {frame_num}",
   "no_frames_read": "未从视频中读取到任何帧。",
   "generating_gif": "已读取 {num_frames} 帧，开始生成 GIF...",
-  "gif_generation_complete": "GIF 生成完成。"
+  "gif_generation_complete": "GIF 生成完成。",
+
+  "tab_image_stitcher": "图片拼接",
+  "stitcher_folder_label": "选择文件夹",
+  "stitcher_select_folder_button": "选择文件夹",
+  "stitcher_stitch_button": "开始拼接",
+  "stitcher_save_button": "保存图片",
+  "stitcher_no_folder_selected": "请先选择一个文件夹。",
+  "stitcher_no_images_found": "在选定的文件夹中未找到图片文件。",
+  "stitcher_error_loading_images": "加载图片时出错: {error}",
+  "stitcher_no_valid_images": "在选定的文件夹中未找到有效的图片。",
+  "stitcher_stitching_complete": "图片拼接完成。",
+  "stitcher_save_success": "拼接后的图片已保存到: {path}",
+  "stitcher_error_saving": "保存图片时出错: {error}",
+  "stitcher_no_image_to_save": "没有可保存的拼接图片。",
+  "stitcher_folder_selected": "已选择文件夹: {folder}"
 }
