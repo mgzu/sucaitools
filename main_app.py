@@ -4,6 +4,7 @@ from language_manager import LanguageManager
 from rename_images_gui import RenamerFrame # Import the refactored frame
 from image_resizer_gui import ImageResizerFrame # Import the image resizer frame
 from video2png_gui import Video2PngFrame # Import the video to png frame
+from mp4_to_gif_gui import Mp4ToGifFrame # Import the new MP4 to GIF frame
 import webbrowser
 # Import other tool modules here later
 
@@ -33,10 +34,12 @@ class MainApplication(ctk.CTk):
         self.renamer_tab_name = self.lang_manager.get_text('tab_rename_images')
         self.resizer_tab_name = self.lang_manager.get_text('tab_resize_images')
         self.video2png_tab_name = self.lang_manager.get_text('tab_video_to_png') # Get initial name
+        self.mp4_to_gif_tab_name = self.lang_manager.get_text('tab_mp4_to_gif') # Get initial name for new tab
 
         self.tab_view.add(self.renamer_tab_name)
         self.tab_view.add(self.resizer_tab_name)
         self.tab_view.add(self.video2png_tab_name)
+        self.tab_view.add(self.mp4_to_gif_tab_name) # Add the new tab
         # self.tab_view.add("Tool 4")
 
         # --- Embed Tool GUIs --- 
@@ -44,6 +47,7 @@ class MainApplication(ctk.CTk):
         self.renamer_tab_frame = self.tab_view.tab(self.renamer_tab_name)
         self.resizer_tab_frame = self.tab_view.tab(self.resizer_tab_name)
         self.video2png_tab_frame = self.tab_view.tab(self.video2png_tab_name)
+        self.mp4_to_gif_tab_frame = self.tab_view.tab(self.mp4_to_gif_tab_name) # Get the new tab frame
 
         # Instantiate and pack the RenamerFrame into its tab
         self.renamer_app = RenamerFrame(self.renamer_tab_frame, self.lang_manager)
@@ -56,6 +60,10 @@ class MainApplication(ctk.CTk):
         # Instantiate and pack the Video2PngFrame into its tab
         self.video2png_app = Video2PngFrame(self.video2png_tab_frame, self.lang_manager)
         self.video2png_app.pack(expand=True, fill="both")
+
+        # Instantiate and pack the Mp4ToGifFrame into its tab
+        self.mp4_to_gif_app = Mp4ToGifFrame(self.mp4_to_gif_tab_frame, self.lang_manager)
+        self.mp4_to_gif_app.pack(expand=True, fill="both")
 
         # GitHub 仓库地址
         self.github_label = ctk.CTkLabel(self, text="GitHub: https://github.com/dependon/sucaitools", cursor="hand2", text_color="#78e46f")
@@ -124,6 +132,7 @@ class MainApplication(ctk.CTk):
         new_renamer_name = self.lang_manager.get_text('tab_rename_images')
         new_resizer_name = self.lang_manager.get_text('tab_resize_images')
         new_video2png_name = self.lang_manager.get_text('tab_video_to_png')
+        new_mp4_to_gif_name = self.lang_manager.get_text('tab_mp4_to_gif', 'MP4 to GIF') # Get new name for the tab
 
         # Store current tab for later
         current_tab = self.tab_view.get()
@@ -141,6 +150,10 @@ class MainApplication(ctk.CTk):
             self.video2png_app.pack_forget()
             self.video2png_app.destroy()
             del self.video2png_app
+        if hasattr(self, 'mp4_to_gif_app'): # Clean up new frame
+            self.mp4_to_gif_app.pack_forget()
+            self.mp4_to_gif_app.destroy()
+            del self.mp4_to_gif_app
 
         # Remove all existing tabs
         for tab in self.tab_view._tab_dict.copy():
@@ -154,16 +167,19 @@ class MainApplication(ctk.CTk):
         self.tab_view.add(new_renamer_name)
         self.tab_view.add(new_resizer_name)
         self.tab_view.add(new_video2png_name)
+        self.tab_view.add(new_mp4_to_gif_name) # Add new tab with updated name
 
         # Update stored names
         self.renamer_tab_name = new_renamer_name
         self.resizer_tab_name = new_resizer_name
         self.video2png_tab_name = new_video2png_name
+        self.mp4_to_gif_tab_name = new_mp4_to_gif_name # Store new tab name
 
         # Get new tab frames and ensure they are ready
         self.renamer_tab_frame = self.tab_view.tab(new_renamer_name)
         self.resizer_tab_frame = self.tab_view.tab(new_resizer_name)
         self.video2png_tab_frame = self.tab_view.tab(new_video2png_name)
+        self.mp4_to_gif_tab_frame = self.tab_view.tab(new_mp4_to_gif_name) # Get new tab frame
 
         # Update the UI before repacking
         self.update()
@@ -182,6 +198,11 @@ class MainApplication(ctk.CTk):
         self.video2png_app.pack(expand=True, fill="both")
         self.video2png_app.update_ui_texts()
 
+        # Re-instantiate and pack the new frame
+        self.mp4_to_gif_app = Mp4ToGifFrame(self.mp4_to_gif_tab_frame, self.lang_manager)
+        self.mp4_to_gif_app.pack(expand=True, fill="both")
+        self.mp4_to_gif_app.update_ui_texts()
+
         # Try to set the previously selected tab
         try:
             if current_tab == self.renamer_tab_name:
@@ -190,6 +211,8 @@ class MainApplication(ctk.CTk):
                 self.tab_view.set(new_resizer_name)
             elif current_tab == self.video2png_tab_name:
                 self.tab_view.set(new_video2png_name)
+            elif current_tab == self.mp4_to_gif_tab_name: # Handle setting the new tab
+                self.tab_view.set(new_mp4_to_gif_name)
         except Exception as e:
             print(f"Error setting current tab: {e}")
             # Default to first tab if there's an error

@@ -4,6 +4,7 @@
   "tab_rename_images": "Rename Images",
   "tab_resize_images": "Resize Images",
   "tab_video_to_png": "Video to PNG",
+  "tab_mp4_to_gif": "MP4 to GIF",
 
   "browse": "Browse...",
   "processing": "Processing...",
@@ -108,5 +109,32 @@
   "error_extraction_failed": "Frame extraction failed.",
   "status_failed": "Extraction failed.",
   "log_drop_invalid_video": "Dropped item is not a valid video file.",
-  "log_drop_invalid_output": "Dropped item is not a valid directory."
+  "log_drop_invalid_output": "Dropped item is not a valid directory.",
+
+  "tab_mp4_to_gif": "MP4 to GIF",
+  "select_mp4_file": "Select MP4 File:",
+  "select_gif_output": "Save GIF As:",
+  "start_conversion": "Start Conversion",
+  "conversion_started": "Conversion started... Input: {input}, Output: {output}",
+  "conversion_placeholder": "Placeholder: Conversion logic needs implementation (requires moviepy).",
+  "conversion_success": "Conversion successful! Output: {output}",
+  "moviepy_missing_error": "Error: moviepy library not found. Please install it (`pip install moviepy`).",
+  "conversion_error": "Error during conversion: {error}",
+  "invalid_mp4_path": "Please select a valid MP4 file.",
+  "invalid_gif_path": "Please specify a valid output GIF path.",
+  "output_is_directory": "Output path cannot be a directory.",
+  "confirm_conversion": "Start conversion?",
+
+  "total_frames": "Total Frames:",
+  "compression_ratio": "Compression Ratio:",
+  "compression_ratio_desc": "(e.g., 2 means process every 2nd frame)",
+  "error_opening_video": "Error opening video file: {file}",
+  "total_frames_loaded": "Total frames loaded: {frames}",
+  "error_loading_video_info": "Error loading video info: {error}",
+  "invalid_compression_ratio": "Invalid compression ratio. Using 1 (no compression).",
+  "video_info": "Video Info - FPS: {fps}, Total Frames: {total_frames}, Compression Ratio: {compression}",
+  "processing_frame": "Processing frame {frame_num}",
+  "no_frames_read": "No frames read from video.",
+  "generating_gif": "Read {num_frames} frames, starting GIF generation...",
+  "gif_generation_complete": "GIF generation complete."
 }
