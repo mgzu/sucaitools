@@ -154,5 +154,8 @@
   "stitcher_save_success": "拼接后的图片已保存到: {path}",
   "stitcher_error_saving": "保存图片时出错: {error}",
   "stitcher_no_image_to_save": "没有可保存的拼接图片。",
-  "stitcher_folder_selected": "已选择文件夹: {folder}"
+  "stitcher_folder_selected": "已选择文件夹: {folder}",
+  "stitcher_folder_placeholder": "输入文件夹路径或将文件夹拖放到此处",
+  "stitcher_invalid_folder_dropped": "拖放的项目不是有效的文件夹。请拖放一个文件夹。",
+  "stitcher_invalid_folder_path": "输入的或选择的文件夹路径无效。"
 }
