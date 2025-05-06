@@ -82,11 +82,11 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         # --- 固定分辨率结束 ---
 
         # --- Process Button --- 
-        self.process_btn = ctk.CTkButton(self, text=self.lang_manager.get_text('start_process'), command=self.start_processing, state=tk.DISABLED)
+        self.process_btn = ctk.CTkButton(self, text=self.lang_manager.get_text('start_resize'), command=self.start_processing, state=tk.DISABLED)
         self.process_btn.grid(row=2, column=0, padx=10, pady=10)
 
-        # --- Status/Warning Label --- 
-        self.status_label = ctk.CTkLabel(self, text=self.lang_manager.get_text('status_wait_folder'), text_color='gray') # Initial text
+        # --- Status/Warning Label ---
+        self.status_label = ctk.CTkLabel(self, text=self.lang_manager.get_text('status_idle'), text_color='gray') # Initial text
         self.status_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
 
         # --- Progress Bar --- 
