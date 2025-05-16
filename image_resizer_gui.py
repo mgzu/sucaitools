@@ -14,6 +14,7 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         super().__init__(master)
         self.lang_manager = lang_manager
         self.folder_path = tk.StringVar() # Use tk.StringVar for compatibility or ctk.StringVar
+        self.folder_path.trace_add("write", self._on_folder_path_change) # Add trace
         self.resize_mode = tk.StringVar(value="scale") # Default to scale
 
         # Configure grid layout for the frame
@@ -100,13 +101,21 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
         # GitHub link can be added back if needed, maybe in a help menu or about section in main app
         # For now, removing it from the frame itself
 
-        self.toggle_inputs()
+        self.toggle_inputs() # Initialize input states
+        self._on_folder_path_change() # Initialize button state based on initial folder_path
 
-    def update_folder_path(self, path):
-        """Update the folder path and status label."""
-        self.folder_path.set(path)
-        self.status_label.configure(text=self.lang_manager.get_text('status_folder_selected').format(folder=path), text_color='gray')
-        self.process_btn.configure(state=tk.NORMAL)
+    def _on_folder_path_change(self, *args):
+        """Callback when folder_path StringVar changes. Updates UI elements accordingly."""
+        path = self.folder_path.get()
+        if path and os.path.isdir(path):
+            self.status_label.configure(text=self.lang_manager.get_text('status_folder_selected').format(folder=os.path.basename(path)), text_color='gray')
+            self.process_btn.configure(state=tk.NORMAL)
+        else:
+            self.process_btn.configure(state=tk.DISABLED)
+            if not path: # Path is empty
+                self.status_label.configure(text=self.lang_manager.get_text('status_idle'), text_color='gray')
+            # else: # Path is not empty but invalid (drag_drop_handler should ideally validate)
+            #     self.status_label.configure(text=self.lang_manager.get_text('select_folder_error'), text_color='red')
 
     def toggle_inputs(self, *args):
         """Enable/disable inputs based on selected mode."""
@@ -127,9 +136,7 @@ class ImageResizerFrame(ctk.CTkFrame): # Inherit from CTkFrame
     def select_directory(self):
         folder = filedialog.askdirectory()
         if folder:
-            self.folder_path.set(folder)
-            self.status_label.configure(text=self.lang_manager.get_text('status_folder_selected').format(folder=folder), text_color='gray')
-            self.process_btn.configure(state=tk.NORMAL)
+            self.folder_path.set(folder) # Triggers _on_folder_path_change via trace
 
     def start_processing(self):
         folder = self.folder_path.get()
