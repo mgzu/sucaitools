@@ -101,5 +101,14 @@
   "log_extracting_frame": "フレーム抽出中 {current}/{total}",
   "log_extraction_complete": "抽出完了。{count}個のフレームを保存しました。",
   "log_extraction_error": "フレーム{frame_number}の抽出中にエラー: {error}",
-  "confirm_extraction_start": "フレーム抽出を開始しますか？"
+  "confirm_extraction_start": "フレーム抽出を開始しますか？",
+
+  "flip_horizontal": "左右反転",
+  "flip_vertical": "上下反転",
+  "select_image_file": "画像ファイルを選択",
+  "color_to_transparent": "色を透明に",
+  "rotate_left": "左回転",
+  "rotate_right": "右回転",
+  "save_image": "画像を保存",
+  "tab_image_processor": "画像処理"
 }

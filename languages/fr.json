@@ -101,5 +101,14 @@
   "log_extracting_frame": "Extraction de l'image {current} sur {total}",
   "log_extraction_complete": "Extraction terminée. {count} images enregistrées.",
   "log_extraction_error": "Erreur lors de l'extraction de l'image {frame_number} : {error}",
-  "confirm_extraction_start": "Démarrer l'extraction des images ?"
+  "confirm_extraction_start": "Démarrer l'extraction des images ?",
+
+  "flip_horizontal": "Retourner horizontalement",
+  "flip_vertical": "Retourner verticalement",
+  "select_image_file": "Sélectionner un fichier image",
+  "color_to_transparent": "Couleur vers Transparent",
+  "rotate_left": "Rotation vers la gauche",
+  "rotate_right": "Rotation vers la droite",
+  "save_image": "Enregistrer l'image",
+  "tab_image_processor": "Processeur d'images"
 }

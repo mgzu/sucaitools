@@ -101,5 +101,14 @@
   "log_extracting_frame": "Extrahiere Frame {current} von {total}",
   "log_extraction_complete": "Extraktion abgeschlossen. {count} Frames gespeichert.",
   "log_extraction_error": "Fehler beim Extrahieren von Frame {frame_number}: {error}",
-  "confirm_extraction_start": "Frame-Extraktion starten?"
+  "confirm_extraction_start": "Frame-Extraktion starten?",
+
+  "flip_horizontal": "Horizontal spiegeln",
+  "flip_vertical": "Vertikal spiegeln",
+  "select_image_file": "Bilddatei auswählen",
+  "color_to_transparent": "Farbe zu Transparent",
+  "rotate_left": "Nach links drehen",
+  "rotate_right": "Nach rechts drehen",
+  "save_image": "Bild speichern",
+  "tab_image_processor": "Bildbearbeitung"
 }

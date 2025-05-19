@@ -150,5 +150,14 @@
   "stitcher_save_success": "Stitched image saved to: {path}",
   "stitcher_error_saving": "Error saving image: {error}",
   "stitcher_no_image_to_save": "No stitched image to save.",
-  "stitcher_folder_selected": "Folder selected: {folder}"
+  "stitcher_folder_selected": "Folder selected: {folder}",
+
+  "flip_horizontal": "Flip Horizontal",
+  "flip_vertical": "Flip Vertical",
+  "select_image_file": "Select Image File",
+  "color_to_transparent": "Color to Transparent",
+  "rotate_left": "Rotate Left",
+  "rotate_right": "Rotate Right",
+  "save_image": "Save Image",
+  "tab_image_processor": "Image Processor"
 }

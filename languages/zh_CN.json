@@ -162,5 +162,14 @@
   "stitcher_folder_selected": "已选择文件夹: {folder}",
   "stitcher_folder_placeholder": "输入文件夹路径或将文件夹拖放到此处",
   "stitcher_invalid_folder_dropped": "拖放的项目不是有效的文件夹。请拖放一个文件夹。",
-  "stitcher_invalid_folder_path": "输入的或选择的文件夹路径无效。"
+  "stitcher_invalid_folder_path": "输入的或选择的文件夹路径无效。",
+
+  "flip_horizontal": "水平翻转",
+  "flip_vertical": "垂直翻转",
+  "select_image_file": "选择图片文件",
+  "color_to_transparent": "颜色转透明",
+  "rotate_left": "左旋转",
+  "rotate_right": "右旋转",
+  "save_image": "保存图片",
+  "tab_image_processor": "图片处理器"
 }

@@ -101,5 +101,11 @@
   "log_extracting_frame": "Извлечение кадра {current} из {total}",
   "log_extraction_complete": "Извлечение завершено. Сохранено кадров: {count}",
   "log_extraction_error": "Ошибка при извлечении кадра {frame_number}: {error}",
-  "confirm_extraction_start": "Начать извлечение кадров?"
+  "confirm_extraction_start": "Начать извлечение кадров?",
+  "select_image_file": "Выбрать файл изображения",
+  "color_to_transparent": "Цвет в прозрачный",
+  "rotate_left": "Повернуть влево",
+  "rotate_right": "Повернуть вправо",
+  "save_image": "Сохранить изображение",
+  "tab_image_processor": "Обработчик изображений"
 }

@@ -101,5 +101,11 @@
   "log_extracting_frame": "Extraindo quadro {current} de {total}",
   "log_extraction_complete": "Extração concluída. {count} quadros salvos.",
   "log_extraction_error": "Erro ao extrair quadro {frame_number}: {error}",
-  "confirm_extraction_start": "Iniciar extração de quadros?"
+  "confirm_extraction_start": "Iniciar extração de quadros?",
+  "select_image_file": "Selecionar Arquivo de Imagem",
+  "color_to_transparent": "Cor para Transparente",
+  "rotate_left": "Girar para Esquerda",
+  "rotate_right": "Girar para Direita",
+  "save_image": "Salvar Imagem",
+  "tab_image_processor": "Processador de Imagem"
 }
