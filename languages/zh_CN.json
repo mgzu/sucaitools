@@ -171,5 +171,18 @@
   "rotate_left": "左旋转",
   "rotate_right": "右旋转",
   "save_image": "保存图片",
-  "tab_image_processor": "图片处理器"
+  "tab_image_processor": "图片处理器",
+
+  "crop_image": "裁剪图片",
+  "resize_image": "缩放图片",
+  "crop_title": "裁剪",
+  "enter_x1": "输入左上角 X 坐标:",
+  "enter_y1": "输入左上角 Y 坐标:",
+  "enter_x2": "输入右下角 X 坐标:",
+  "enter_y2": "输入右下角 Y 坐标:",
+  "resize_title": "缩放",
+  "enter_new_dimensions": "输入新尺寸 (宽,高):",
+  "error_invalid_dimensions": "无效的尺寸。宽度和高度必须是正整数。",
+  "error_invalid_dimensions_format": "无效的格式。请输入“宽度,高度”，例如“800,600”。",
+  "error_during_resize": "缩放过程中出错"
 }

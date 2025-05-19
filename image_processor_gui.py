@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import filedialog, colorchooser, simpledialog
+from tkinter import filedialog, colorchooser, simpledialog, messagebox
 from PIL import Image, ImageTk
 import os
 import tkinterdnd2
@@ -40,7 +40,7 @@ class ImageProcessorFrame(ctk.CTkFrame):
         # --- Controls Frame ---
         self.controls_frame = ctk.CTkFrame(self)
         self.controls_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-        self.controls_frame.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1) # Added one more column for the new button
+        self.controls_frame.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1) # Adjusted columns after removing crop
 
         self.flip_horizontal_button = ctk.CTkButton(self.controls_frame, text=self.lang_manager.get_text('flip_horizontal'), command=self.flip_horizontal)
         self.flip_horizontal_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
@@ -57,8 +57,11 @@ class ImageProcessorFrame(ctk.CTkFrame):
         self.rotate_right_button = ctk.CTkButton(self.controls_frame, text=self.lang_manager.get_text('rotate_right'), command=lambda: self.rotate_image(-90))
         self.rotate_right_button.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
+        self.resize_button = ctk.CTkButton(self.controls_frame, text=self.lang_manager.get_text('resize_image'), command=self.resize_image)
+        self.resize_button.grid(row=0, column=5, padx=5, pady=5, sticky="ew")
+
         self.save_button = ctk.CTkButton(self.controls_frame, text=self.lang_manager.get_text('save_image'), command=self.save_image)
-        self.save_button.grid(row=0, column=5, padx=5, pady=5, sticky="ew") # Moved save button to the last column
+        self.save_button.grid(row=0, column=6, padx=5, pady=5, sticky="ew") # Moved save button to the last column
 
         # --- Drag and Drop ---
         self.drop_target_register(tkinterdnd2.DND_FILES)
@@ -74,6 +77,7 @@ class ImageProcessorFrame(ctk.CTkFrame):
         self.color_to_transparent_button.configure(text=self.lang_manager.get_text('color_to_transparent'))
         self.rotate_left_button.configure(text=self.lang_manager.get_text('rotate_left'))
         self.rotate_right_button.configure(text=self.lang_manager.get_text('rotate_right'))
+        self.resize_button.configure(text=self.lang_manager.get_text('resize_image'))
         self.save_button.configure(text=self.lang_manager.get_text('save_image'))
 
     def select_image(self):
@@ -189,6 +193,43 @@ class ImageProcessorFrame(ctk.CTkFrame):
             self.processed_image = self.processed_image.rotate(degrees, expand=True)
             self.display_image()
 
+    def resize_image(self):
+        if self.processed_image:
+            current_width, current_height = self.processed_image.size
+            default_text = f"{current_width},{current_height}"
+
+            # Prompt user for new dimensions (width,height)
+            new_dimensions_str = simpledialog.askstring(
+                self.lang_manager.get_text('resize_title'),
+                self.lang_manager.get_text('enter_new_dimensions'),
+                parent=self,
+                initialvalue=default_text
+            )
+
+            if new_dimensions_str is None: # User cancelled
+                return
+
+            try:
+                width_str, height_str = new_dimensions_str.split(',')
+                new_width = int(width_str.strip())
+                new_height = int(height_str.strip())
+
+                # Ensure dimensions are valid
+                if new_width <= 0 or new_height <= 0:
+                    messagebox.showerror(self.lang_manager.get_text('error_title'), self.lang_manager.get_text('error_invalid_dimensions'))
+                    return
+
+                # Apply resize
+                self.processed_image = self.processed_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                self.display_image()
+
+            except ValueError:
+                messagebox.showerror(self.lang_manager.get_text('error_title'), self.lang_manager.get_text('error_invalid_dimensions_format'))
+            except Exception as e:
+                print(f"Error during resizing: {e}")
+                messagebox.showerror(self.lang_manager.get_text('error_title'), f"{self.lang_manager.get_text('error_during_resize')}: {e}")
+
+
     def save_image(self):
         if self.processed_image and self.current_image_path:
             original_dir = os.path.dirname(self.current_image_path)
@@ -242,7 +283,14 @@ if __name__ == "__main__":
                 'mirror_direction_prompt': '输入镜像方向 (水平/垂直):', # This key is no longer used in the main class but kept for the mock
                 'horizontal': '水平', # This key is no longer used in the main class but kept for the mock
                 'vertical': '垂直', # This key is no longer used in the main class but kept for the mock
-                'select_color_for_transparency': '选择透明色'
+                'select_color_for_transparency': '选择透明色',
+                'resize_image': '缩放图片',
+                'resize_title': '缩放',
+                'enter_new_dimensions': '输入新尺寸 (宽,高):',
+                'error_title': '错误',
+                'error_invalid_dimensions': '无效的尺寸。宽度和高度必须是正整数。',
+                'error_invalid_dimensions_format': '无效的格式。请输入“宽度,高度”，例如“800,600”。',
+                'error_during_resize': '缩放过程中出错'
             }
             return texts.get(key, key)
 
