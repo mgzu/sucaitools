@@ -8,6 +8,7 @@ from mp4_to_gif_gui import Mp4ToGifFrame # Import the new MP4 to GIF frame
 from image_stitcher_gui import ImageStitcherFrame # Import the image stitcher frame
 from image_processor_gui import ImageProcessorFrame # Import the new image processor frame
 from jpg_to_png_gui import JpgToPngFrame # Import the new JPG to PNG frame
+from image_rotator_gui import ImageRotatorFrame # Import the new image rotator frame
 import webbrowser
 # Import other tool modules here later
 
@@ -41,6 +42,7 @@ class MainApplication(ctk.CTk):
         self.stitcher_tab_name = self.lang_manager.get_text('tab_image_stitcher') # Get initial name for image stitcher tab
         self.image_processor_tab_name = self.lang_manager.get_text('tab_image_processor') # Get initial name for image processor tab
         self.jpg_to_png_tab_name = self.lang_manager.get_text('tab_jpg_to_png') # Get initial name for JPG to PNG tab
+        self.image_rotator_tab_name = self.lang_manager.get_text('tab_image_rotator') # Get initial name for image rotator tab
 
         self.tab_view.add(self.renamer_tab_name)
         self.tab_view.add(self.resizer_tab_name)
@@ -48,7 +50,8 @@ class MainApplication(ctk.CTk):
         self.tab_view.add(self.mp4_to_gif_tab_name) # Add the new tab
         self.tab_view.add(self.stitcher_tab_name) # Add the image stitcher tab
         self.tab_view.add(self.image_processor_tab_name) # Add the new image processor tab
-        self.tab_view.add(self.jpg_to_png_tab_name) # Add the JPG to PNG tab
+        self.tab_view.add(self.jpg_to_png_tab_name) # Add the new JPG to PNG tab
+        self.tab_view.add(self.image_rotator_tab_name) # Add the new image rotator tab
         # self.tab_view.add("Tool 4")
 
         # --- Embed Tool GUIs ---
@@ -60,6 +63,7 @@ class MainApplication(ctk.CTk):
         self.stitcher_tab_frame = self.tab_view.tab(self.stitcher_tab_name) # Get the image stitcher tab frame
         self.image_processor_tab_frame = self.tab_view.tab(self.image_processor_tab_name) # Get the new image processor tab frame
         self.jpg_to_png_tab_frame = self.tab_view.tab(self.jpg_to_png_tab_name) # Get the JPG to PNG tab frame
+        self.image_rotator_tab_frame = self.tab_view.tab(self.image_rotator_tab_name) # Get the image rotator tab frame
 
         # Instantiate and pack the RenamerFrame into its tab
         self.renamer_app = RenamerFrame(self.renamer_tab_frame, self.lang_manager)
@@ -88,6 +92,10 @@ class MainApplication(ctk.CTk):
         # Instantiate and pack the JpgToPngFrame into its tab
         self.jpg_to_png_app = JpgToPngFrame(self.jpg_to_png_tab_frame, self.lang_manager)
         self.jpg_to_png_app.pack(expand=True, fill="both")
+
+        # Instantiate and pack the ImageRotatorFrame into its tab
+        self.image_rotator_app = ImageRotatorFrame(self.image_rotator_tab_frame, self.lang_manager)
+        self.image_rotator_app.pack(expand=True, fill="both")
 
         # GitHub 仓库地址
         self.github_label = ctk.CTkLabel(self, text="GitHub: https://github.com/dependon/sucaitools", cursor="hand2", text_color="#78e46f")
@@ -160,6 +168,7 @@ class MainApplication(ctk.CTk):
         new_stitcher_name = self.lang_manager.get_text('tab_image_stitcher') # Get new name for the image stitcher tab
         new_image_processor_name = self.lang_manager.get_text('tab_image_processor') # Get new name for the image processor tab
         new_jpg_to_png_name = self.lang_manager.get_text('tab_jpg_to_png') # Get new name for the JPG to PNG tab
+        new_image_rotator_name = self.lang_manager.get_text('tab_image_rotator') # Get new name for the image rotator tab
 
         # Store current tab for later
         current_tab = self.tab_view.get()
@@ -193,6 +202,10 @@ class MainApplication(ctk.CTk):
             self.jpg_to_png_app.pack_forget()
             self.jpg_to_png_app.destroy()
             del self.jpg_to_png_app
+        if hasattr(self, 'image_rotator_app'): # Clean up image rotator frame
+            self.image_rotator_app.pack_forget()
+            self.image_rotator_app.destroy()
+            del self.image_rotator_app
 
         # Remove all existing tabs
         for tab in self.tab_view._tab_dict.copy():
@@ -210,6 +223,7 @@ class MainApplication(ctk.CTk):
         self.tab_view.add(new_stitcher_name) # Add new image stitcher tab with updated name
         self.tab_view.add(new_image_processor_name) # Add new image processor tab with updated name
         self.tab_view.add(new_jpg_to_png_name) # Add new JPG to PNG tab with updated name
+        self.tab_view.add(new_image_rotator_name) # Add new image rotator tab with updated name
 
         # Update stored names
         self.renamer_tab_name = new_renamer_name
@@ -219,6 +233,7 @@ class MainApplication(ctk.CTk):
         self.stitcher_tab_name = new_stitcher_name # Store new image stitcher tab name
         self.image_processor_tab_name = new_image_processor_name # Store new image processor tab name
         self.jpg_to_png_tab_name = new_jpg_to_png_name # Store new JPG to PNG tab name
+        self.image_rotator_tab_name = new_image_rotator_name # Store new image rotator tab name
 
         # Get new tab frames and ensure they are ready
         self.renamer_tab_frame = self.tab_view.tab(new_renamer_name)
@@ -228,6 +243,7 @@ class MainApplication(ctk.CTk):
         self.stitcher_tab_frame = self.tab_view.tab(new_stitcher_name) # Get new image stitcher tab frame
         self.image_processor_tab_frame = self.tab_view.tab(new_image_processor_name) # Get new image processor tab frame
         self.jpg_to_png_tab_frame = self.tab_view.tab(new_jpg_to_png_name) # Get new JPG to PNG tab frame
+        self.image_rotator_tab_frame = self.tab_view.tab(new_image_rotator_name) # Get new image rotator tab frame
 
         # Update the UI before repacking
         self.update()
@@ -266,6 +282,11 @@ class MainApplication(ctk.CTk):
         self.jpg_to_png_app.pack(expand=True, fill="both")
         self.jpg_to_png_app.update_ui_texts()
 
+        # Re-instantiate and pack the image rotator frame
+        self.image_rotator_app = ImageRotatorFrame(self.image_rotator_tab_frame, self.lang_manager)
+        self.image_rotator_app.pack(expand=True, fill="both")
+        self.image_rotator_app.update_ui_texts()
+
 
         # Try to set the previously selected tab
         try:
@@ -283,6 +304,8 @@ class MainApplication(ctk.CTk):
                 self.tab_view.set(new_image_processor_name)
             elif current_tab == self.jpg_to_png_tab_name: # Handle setting the JPG to PNG tab
                 self.tab_view.set(new_jpg_to_png_name)
+            elif current_tab == self.image_rotator_tab_name: # Handle setting the image rotator tab
+                self.tab_view.set(new_image_rotator_name)
         except Exception as e:
             print(f"Error setting current tab: {e}")
             # Default to first tab if there's an error
