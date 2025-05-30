@@ -5,6 +5,7 @@
   "tab_resize_images": "图片批量缩放",
   "tab_video_to_png": "视频转图片序列",
   "tab_mp4_to_gif": "MP4转GIF",
+  "tab_jpg_to_png": "批量JPG转PNG",
 
   "browse": "浏览...",
   "processing": "处理中...",
@@ -184,5 +185,16 @@
   "enter_new_dimensions": "输入新尺寸 (宽,高):",
   "error_invalid_dimensions": "无效的尺寸。宽度和高度必须是正整数。",
   "error_invalid_dimensions_format": "无效的格式。请输入“宽度,高度”，例如“800,600”。",
-  "error_during_resize": "缩放过程中出错"
+  "error_during_resize": "缩放过程中出错",
+
+  "select_folder_placeholder": "选择包含JPG图片的文件夹",
+  "recursive_processing": "递归处理子文件夹",
+  "start_conversion": "开始转换",
+  "confirm_title": "确认操作",
+  "confirm_jpg_to_png_operation": "这将把文件夹 '{folder}' 中的所有JPG图片转换为PNG格式。确定吗？",
+  "processing_folder": "正在处理文件夹: {folder}",
+  "conversion_success": "转换成功: {input} -> {output}",
+  "conversion_error": "转换 {file} 时出错: {error}",
+  "conversion_complete": "转换完成。总共转换了 {total} 个文件。",
+  "skip_existing_file": "跳过 (文件已存在): {input} -> {output}"
 }

@@ -5,6 +5,7 @@
   "tab_resize_images": "Resize Images",
   "tab_video_to_png": "Video to PNG",
   "tab_mp4_to_gif": "MP4 to GIF",
+  "tab_jpg_to_png": "Batch JPG to PNG",
 
   "browse": "Browse...",
   "processing": "Processing...",
@@ -159,5 +160,16 @@
   "rotate_left": "Rotate Left",
   "rotate_right": "Rotate Right",
   "save_image": "Save Image",
-  "tab_image_processor": "Image Processor"
+  "tab_image_processor": "Image Processor",
+
+  "select_folder_placeholder": "Select folder containing JPG images",
+  "recursive_processing": "Process subfolders recursively",
+  "start_conversion": "Start Conversion",
+  "confirm_title": "Confirm Operation",
+  "confirm_jpg_to_png_operation": "This will convert all JPG images in folder '{folder}' to PNG format. Are you sure?",
+  "processing_folder": "Processing folder: {folder}",
+  "conversion_success": "Converted successfully: {input} -> {output}",
+  "conversion_error": "Error converting {file}: {error}",
+  "conversion_complete": "Conversion complete. Total files converted: {total}",
+  "skip_existing_file": "Skipped (file exists): {input} -> {output}"
 }
