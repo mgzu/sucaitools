@@ -108,7 +108,8 @@ class ImageStitcherFrame(ctk.CTkFrame):
              self.status_label.configure(text="")
              self.save_button.configure(state="disabled")
              self.stitched_image = None
-             self.image_display_label.configure(image=None, text=self.lang_manager.get_text('stitcher_display_area')) # Clear displayed image
+             self.stitched_ctk_image = None  # Clear the CTkImage reference
+             self.image_display_label.configure(image="", text=self.lang_manager.get_text('stitcher_display_area')) # Clear displayed image
 
     def select_folder(self):
         folder_path = filedialog.askdirectory()
@@ -119,6 +120,11 @@ class ImageStitcherFrame(ctk.CTkFrame):
         if not self.selected_folder or not os.path.isdir(self.selected_folder):
             self.status_label.configure(text=self.lang_manager.get_text('stitcher_no_folder_selected'))
             return
+
+        # Clear previous stitched image
+        self.stitched_image = None
+        self.stitched_ctk_image = None
+        self.image_display_label.configure(image="", text=self.lang_manager.get_text('stitcher_display_area'))
 
         image_files = [f for f in os.listdir(self.selected_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))]
         if not image_files:
@@ -209,7 +215,11 @@ class ImageStitcherFrame(ctk.CTkFrame):
                 self.image_display_label.configure(image=self.stitched_ctk_image, text="")
             else:
                 # If label size is not available yet, clear the image
-                self.image_display_label.configure(image=None, text=self.lang_manager.get_text('stitcher_display_area')) # Add a placeholder text
+                self.image_display_label.configure(image="", text=self.lang_manager.get_text('stitcher_display_area')) # Add a placeholder text
+        else:
+            # No stitched image available, clear the display
+            self.stitched_ctk_image = None
+            self.image_display_label.configure(image="", text=self.lang_manager.get_text('stitcher_display_area'))
 
     def on_image_display_resize(self, event):
         """Handles resizing of the image display label."""
