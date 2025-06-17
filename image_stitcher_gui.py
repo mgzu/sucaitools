@@ -214,12 +214,8 @@ class ImageStitcherFrame(ctk.CTkFrame):
             x_offset = 0
             y_offset = 0
             for i, img in enumerate(images):
-                # Center the image in its cell
-                img_width, img_height = img.size
-                center_x = x_offset + (max_width - img_width) // 2
-                center_y = y_offset + (max_height - img_height) // 2
-                
-                self.stitched_image.paste(img, (center_x, center_y))
+                # Align the image to top-left corner of its cell
+                self.stitched_image.paste(img, (x_offset, y_offset))
                 
                 x_offset += max_width
                 if (i + 1) % cols == 0: # Use cols for wrapping to the next row
