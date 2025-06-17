@@ -27,18 +27,32 @@ class ImageStitcherFrame(ctk.CTkFrame):
         self.folder_frame.grid_rowconfigure(0, weight=0) # Label row
         self.folder_frame.grid_rowconfigure(1, weight=1) # Entry and Button row
 
-        # --- Columns Setting ---
-        self.columns_frame = ctk.CTkFrame(self)
-        self.columns_frame.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-        self.columns_frame.grid_columnconfigure(0, weight=1)
-        self.columns_frame.grid_columnconfigure(1, weight=1)
+        # --- Settings Frame ---
+        self.settings_frame = ctk.CTkFrame(self)
+        self.settings_frame.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.settings_frame.grid_columnconfigure(0, weight=1)
+        self.settings_frame.grid_columnconfigure(1, weight=1)
+        self.settings_frame.grid_columnconfigure(2, weight=1)
+        self.settings_frame.grid_columnconfigure(3, weight=1)
         
-        self.columns_label = ctk.CTkLabel(self.columns_frame, text=self.lang_manager.get_text('stitcher_columns_label'))
+        # Columns setting
+        self.columns_label = ctk.CTkLabel(self.settings_frame, text=self.lang_manager.get_text('stitcher_columns_label'))
         self.columns_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         
         self.columns_var = ctk.StringVar(value="3")
-        self.columns_entry = ctk.CTkEntry(self.columns_frame, textvariable=self.columns_var, width=100)
+        self.columns_entry = ctk.CTkEntry(self.settings_frame, textvariable=self.columns_var, width=80)
         self.columns_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        
+        # Resize mode setting
+        self.resize_mode_label = ctk.CTkLabel(self.settings_frame, text="拼接模式:")
+        self.resize_mode_label.grid(row=0, column=2, padx=5, pady=5, sticky="w")
+        
+        self.resize_mode_var = ctk.StringVar(value="统一尺寸")
+        self.resize_mode_combo = ctk.CTkComboBox(self.settings_frame, 
+                                                values=["统一尺寸", "保持原始尺寸"],
+                                                variable=self.resize_mode_var,
+                                                width=120)
+        self.resize_mode_combo.grid(row=0, column=3, padx=5, pady=5, sticky="w")
 
 
         self.folder_label = ctk.CTkLabel(self.folder_frame, text=self.lang_manager.get_text('stitcher_folder_label'))
@@ -144,10 +158,6 @@ class ImageStitcherFrame(ctk.CTkFrame):
             self.status_label.configure(text=self.lang_manager.get_text('stitcher_no_valid_images'))
             return
 
-        # Assuming all images have the same size for simple grid stitching
-        # In a real application, you might need more complex handling for different sizes
-        first_img = images[0]
-        img_width, img_height = first_img.size
         num_images = len(images)
 
         # Calculate grid dimensions
@@ -162,24 +172,59 @@ class ImageStitcherFrame(ctk.CTkFrame):
         
         rows = (num_images + cols - 1) // cols # Ceiling division to get the number of rows
 
-        # Calculate stitched image dimensions
-        stitched_width = img_width * cols
-        stitched_height = img_height * rows
-
-        self.stitched_image = Image.new('RGBA', (stitched_width, stitched_height))
-
-        x_offset = 0
-        y_offset = 0
-        for i, img in enumerate(images):
-            # Resize image if it's not the same size as the first one (basic handling)
-            if img.size != (img_width, img_height):
-                 img = img.resize((img_width, img_height))
-                 
-            self.stitched_image.paste(img, (x_offset, y_offset))
-            x_offset += img_width
-            if (i + 1) % cols == 0: # Use cols for wrapping to the next row
-                x_offset = 0
-                y_offset += img_height
+        # Get resize mode
+        resize_mode = self.resize_mode_var.get()
+        
+        if resize_mode == "统一尺寸":
+            # Original logic: resize all images to the same size
+            first_img = images[0]
+            img_width, img_height = first_img.size
+            
+            # Calculate stitched image dimensions
+            stitched_width = img_width * cols
+            stitched_height = img_height * rows
+            
+            self.stitched_image = Image.new('RGBA', (stitched_width, stitched_height))
+            
+            x_offset = 0
+            y_offset = 0
+            for i, img in enumerate(images):
+                # Resize image if it's not the same size as the first one
+                if img.size != (img_width, img_height):
+                     img = img.resize((img_width, img_height))
+                     
+                self.stitched_image.paste(img, (x_offset, y_offset))
+                x_offset += img_width
+                if (i + 1) % cols == 0: # Use cols for wrapping to the next row
+                    x_offset = 0
+                    y_offset += img_height
+        
+        else:  # 保持原始尺寸
+            # New logic: keep original sizes, calculate cell dimensions based on max sizes
+            # Find the maximum width and height among all images
+            max_width = max(img.size[0] for img in images)
+            max_height = max(img.size[1] for img in images)
+            
+            # Calculate stitched image dimensions
+            stitched_width = max_width * cols
+            stitched_height = max_height * rows
+            
+            self.stitched_image = Image.new('RGBA', (stitched_width, stitched_height))
+            
+            x_offset = 0
+            y_offset = 0
+            for i, img in enumerate(images):
+                # Center the image in its cell
+                img_width, img_height = img.size
+                center_x = x_offset + (max_width - img_width) // 2
+                center_y = y_offset + (max_height - img_height) // 2
+                
+                self.stitched_image.paste(img, (center_x, center_y))
+                
+                x_offset += max_width
+                if (i + 1) % cols == 0: # Use cols for wrapping to the next row
+                    x_offset = 0
+                    y_offset += max_height
 
         self.status_label.configure(text=self.lang_manager.get_text('stitcher_stitching_complete'))
         self.save_button.configure(state="normal")
@@ -244,6 +289,7 @@ class ImageStitcherFrame(ctk.CTkFrame):
         self.folder_entry.configure(placeholder_text=self.lang_manager.get_text('stitcher_folder_placeholder'))
         self.select_folder_button.configure(text=self.lang_manager.get_text('stitcher_select_folder_button'))
         self.columns_label.configure(text=self.lang_manager.get_text('stitcher_columns_label'))
+        self.resize_mode_label.configure(text=self.lang_manager.get_text('stitcher_resize_mode_label'))
         self.stitch_button.configure(text=self.lang_manager.get_text('stitcher_stitch_button'))
         self.save_button.configure(text=self.lang_manager.get_text('stitcher_save_button'))
         # Update status label if it contains a language string
@@ -280,7 +326,8 @@ if __name__ == "__main__":
                 'stitcher_error_saving': 'Error saving image: {error}',
                 'stitcher_no_image_to_save': 'No stitched image to save.',
                 'stitcher_folder_selected': 'Folder selected: {folder}',
-                'stitcher_display_area': 'Image stitching effect will be displayed here, scaled to fit the window size.' # Added placeholder text
+                'stitcher_display_area': 'Image stitching effect will be displayed here, scaled to fit the window size.',
+                'stitcher_resize_mode_label': 'Stitch Mode:' # Added placeholder text
             }
             return texts.get(key, f"_{key}_")
 
