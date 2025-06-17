@@ -16,7 +16,7 @@ class ImageStitcherFrame(ctk.CTkFrame):
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(3, weight=1) # Row for status label
+        self.grid_rowconfigure(4, weight=1) # Row for image display area
 
         # --- Folder Selection ---
         self.folder_frame = ctk.CTkFrame(self)
@@ -26,6 +26,19 @@ class ImageStitcherFrame(ctk.CTkFrame):
         self.folder_frame.grid_columnconfigure(1, weight=1) # Button column
         self.folder_frame.grid_rowconfigure(0, weight=0) # Label row
         self.folder_frame.grid_rowconfigure(1, weight=1) # Entry and Button row
+
+        # --- Columns Setting ---
+        self.columns_frame = ctk.CTkFrame(self)
+        self.columns_frame.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.columns_frame.grid_columnconfigure(0, weight=1)
+        self.columns_frame.grid_columnconfigure(1, weight=1)
+        
+        self.columns_label = ctk.CTkLabel(self.columns_frame, text=self.lang_manager.get_text('stitcher_columns_label'))
+        self.columns_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        
+        self.columns_var = ctk.StringVar(value="3")
+        self.columns_entry = ctk.CTkEntry(self.columns_frame, textvariable=self.columns_var, width=100)
+        self.columns_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
 
         self.folder_label = ctk.CTkLabel(self.folder_frame, text=self.lang_manager.get_text('stitcher_folder_label'))
@@ -52,11 +65,11 @@ class ImageStitcherFrame(ctk.CTkFrame):
 
         # --- Status Label ---
         self.status_label = ctk.CTkLabel(self, text="", wraplength=780)
-        self.status_label.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.status_label.grid(row=2, column=0, padx=10, pady=5, sticky="ew")
 
         # --- Action Buttons ---
         self.button_frame = ctk.CTkFrame(self)
-        self.button_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+        self.button_frame.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
 
         self.stitch_button = ctk.CTkButton(self.button_frame, text=self.lang_manager.get_text('stitcher_stitch_button'), command=self.stitch_images)
@@ -70,7 +83,7 @@ class ImageStitcherFrame(ctk.CTkFrame):
 
         # --- Image Display Area ---
         self.image_display_frame = ctk.CTkFrame(self)
-        self.image_display_frame.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
+        self.image_display_frame.grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
         self.image_display_frame.grid_columnconfigure(0, weight=1)
         self.image_display_frame.grid_rowconfigure(0, weight=1)
 
@@ -132,12 +145,15 @@ class ImageStitcherFrame(ctk.CTkFrame):
         num_images = len(images)
 
         # Calculate grid dimensions
-        # Determine the number of columns (can be optimized based on aspect ratio if needed)
-        # For simplicity, let's try to make it as close to a square grid as possible
-        cols = int(num_images**0.5)
-        # Ensure at least one column if there are images
-        if cols == 0 and num_images > 0:
-            cols = 1
+        # Get user-defined number of columns
+        try:
+            cols = int(self.columns_var.get())
+            if cols <= 0:
+                cols = 3  # Default to 3 if invalid input
+        except ValueError:
+            cols = 3  # Default to 3 if invalid input
+            self.columns_var.set("3")  # Reset to default value
+        
         rows = (num_images + cols - 1) // cols # Ceiling division to get the number of rows
 
         # Calculate stitched image dimensions
@@ -217,6 +233,7 @@ class ImageStitcherFrame(ctk.CTkFrame):
         self.folder_label.configure(text=self.lang_manager.get_text('stitcher_folder_label'))
         self.folder_entry.configure(placeholder_text=self.lang_manager.get_text('stitcher_folder_placeholder'))
         self.select_folder_button.configure(text=self.lang_manager.get_text('stitcher_select_folder_button'))
+        self.columns_label.configure(text=self.lang_manager.get_text('stitcher_columns_label'))
         self.stitch_button.configure(text=self.lang_manager.get_text('stitcher_stitch_button'))
         self.save_button.configure(text=self.lang_manager.get_text('stitcher_save_button'))
         # Update status label if it contains a language string
@@ -241,6 +258,7 @@ if __name__ == "__main__":
             texts = {
                 'stitcher_folder_label': 'Selected Folder',
                 'stitcher_select_folder_button': 'Select Folder',
+                'stitcher_columns_label': 'Columns per row:',
                 'stitcher_stitch_button': 'Stitch Images',
                 'stitcher_save_button': 'Save Stitched Image',
                 'stitcher_no_folder_selected': 'Please select a folder first.',

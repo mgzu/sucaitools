@@ -151,6 +151,7 @@
   "tab_image_stitcher": "图片拼接",
   "stitcher_folder_label": "选择文件夹",
   "stitcher_select_folder_button": "选择文件夹",
+  "stitcher_columns_label": "每行图片数量:",
   "stitcher_stitch_button": "开始拼接",
   "stitcher_save_button": "保存图片",
   "stitcher_no_folder_selected": "请先选择一个文件夹。",

@@ -142,6 +142,7 @@
   "tab_image_stitcher": "Image Stitcher",
   "stitcher_folder_label": "Select Folder",
   "stitcher_select_folder_button": "Select Folder",
+  "stitcher_columns_label": "Columns per row:",
   "stitcher_stitch_button": "Start Stitching",
   "stitcher_save_button": "Save Image",
   "stitcher_no_folder_selected": "Please select a folder first.",
