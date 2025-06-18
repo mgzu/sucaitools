@@ -7,6 +7,7 @@
   "tab_mp4_to_gif": "MP4 to GIF",
   "tab_jpg_to_png": "Batch JPG to PNG",
   "tab_image_rotator": "Batch Image Rotation",
+  "tab_image_splitter": "Batch Image Split",
 
   "browse": "Browse...",
   "processing": "Processing...",
@@ -179,6 +180,7 @@
   "rotate_right": "Rotate Right",
   "save_image": "Save Image",
   "tab_image_processor": "Image Processor",
+  "splitter_number": "Image Splitter Number",
 
   "select_folder_placeholder": "Select folder containing JPG images",
   "recursive_processing": "Process subfolders recursively",

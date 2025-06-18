@@ -7,6 +7,7 @@
   "tab_mp4_to_gif": "MP4转GIF",
   "tab_jpg_to_png": "批量JPG转PNG",
   "tab_image_rotator": "图片批量旋转",
+  "tab_image_splitter": "图片批量分割",
 
   "browse": "浏览...",
   "processing": "处理中...",
@@ -191,6 +192,7 @@
   "rotate_right": "右旋转",
   "save_image": "保存图片",
   "tab_image_processor": "图片处理器",
+  "splitter_number": "图片分割数量",
 
   "crop_image": "裁剪图片",
   "resize_image": "缩放图片",

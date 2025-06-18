@@ -1,5 +1,8 @@
 import customtkinter as ctk
 from tkinter import ttk
+# Addons begin
+from image_splitter.image_splitter_gui import ImageSplitterFrame
+# Addons end
 from language_manager import LanguageManager
 from rename_images_gui import RenamerFrame # Import the refactored frame
 from image_resizer_gui import ImageResizerFrame # Import the image resizer frame
@@ -25,7 +28,7 @@ class MainApplication(ctk.CTk):
         self.configure(bg="#242424")      # 设置主窗口背景为深灰色
  
         self.title(self.lang_manager.get_text('main_title')) # Assuming 'main_title' key exists
-        self.geometry("800x600")
+        self.geometry("1920x1080")
 
         # --- Language Selector --- (Moved to main app)
         self.create_language_selector()
@@ -43,6 +46,9 @@ class MainApplication(ctk.CTk):
         self.image_processor_tab_name = self.lang_manager.get_text('tab_image_processor') # Get initial name for image processor tab
         self.jpg_to_png_tab_name = self.lang_manager.get_text('tab_jpg_to_png') # Get initial name for JPG to PNG tab
         self.image_rotator_tab_name = self.lang_manager.get_text('tab_image_rotator') # Get initial name for image rotator tab
+        # Addons begin
+        self.image_splitter_tab_name = self.lang_manager.get_text('tab_image_splitter') # Get initial name for image splitter tab
+        # Addons end
 
         self.tab_view.add(self.renamer_tab_name)
         self.tab_view.add(self.resizer_tab_name)
@@ -52,6 +58,9 @@ class MainApplication(ctk.CTk):
         self.tab_view.add(self.image_processor_tab_name) # Add the new image processor tab
         self.tab_view.add(self.jpg_to_png_tab_name) # Add the new JPG to PNG tab
         self.tab_view.add(self.image_rotator_tab_name) # Add the new image rotator tab
+        # Addons begin
+        self.tab_view.add(self.image_splitter_tab_name) # Add the new image splitter tab
+        # Addons end
         # self.tab_view.add("Tool 4")
 
         # --- Embed Tool GUIs ---
@@ -64,6 +73,9 @@ class MainApplication(ctk.CTk):
         self.image_processor_tab_frame = self.tab_view.tab(self.image_processor_tab_name) # Get the new image processor tab frame
         self.jpg_to_png_tab_frame = self.tab_view.tab(self.jpg_to_png_tab_name) # Get the JPG to PNG tab frame
         self.image_rotator_tab_frame = self.tab_view.tab(self.image_rotator_tab_name) # Get the image rotator tab frame
+        # Addons begin
+        self.image_splitter_tab_frame = self.tab_view.tab(self.image_splitter_tab_name) # Get the image splitter tab frame
+        # Addons end
 
         # Instantiate and pack the RenamerFrame into its tab
         self.renamer_app = RenamerFrame(self.renamer_tab_frame, self.lang_manager)
@@ -96,6 +108,12 @@ class MainApplication(ctk.CTk):
         # Instantiate and pack the ImageRotatorFrame into its tab
         self.image_rotator_app = ImageRotatorFrame(self.image_rotator_tab_frame, self.lang_manager)
         self.image_rotator_app.pack(expand=True, fill="both")
+
+        # Addons begin
+        # Instantiate and pack the ImageSplitterFrame into its tab
+        self.image_splitter_app = ImageSplitterFrame(self.image_splitter_tab_frame, self.lang_manager)
+        self.image_splitter_app.pack(expand=True, fill="both")
+        # Addons end
 
         # GitHub 仓库地址
         self.github_label = ctk.CTkLabel(self, text="GitHub: https://github.com/dependon/sucaitools", cursor="hand2", text_color="#78e46f")
